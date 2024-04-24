@@ -202,10 +202,13 @@ manager.onProgress = function (url, itemsLoaded, itemsTotal) {
             document.querySelector(".progress").remove()
             document.querySelector("#blocker").remove()
             setTimeout(() => {
-              playAnim(0, "play")
               setTimeout(() => {
                 prompt()
               }, 12000)
+              try {
+                audio.play()
+                playAnim(0, "play")
+              } catch {}
             }, 2000)
           },
         })
@@ -234,6 +237,7 @@ manager.onProgress = function (url, itemsLoaded, itemsTotal) {
                 prompt()
               }, 12000)
               try {
+                audio.play()
                 playAnim(0, "play")
               } catch {}
             }, 2000)
@@ -457,14 +461,47 @@ window.addEventListener("mousedown", (event) => {
     let pointedObject = intersects[0].object
     if (pointedObject.name == "Hidden_start") isCorrectStart = true
   }
-
-  // console.log(camera.position)
-  // console.log(camera.rotation)
 })
 
 window.addEventListener("mouseup", (event) => {
   mouse.x = ((2 * event.clientX - window.innerWidth) / window.innerWidth) * 2 - 1
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+
+  raycaster.setFromCamera(mouse, camera)
+  const intersects = raycaster.intersectObjects(scene.children, true)
+
+  if (intersects.length > 0) {
+    let pointedObject = intersects[0].object
+    if (pointedObject.name === "Hidden_end" && isInteractAvailable && isCorrectStart) {
+      isUserInteracted = true
+      isInteractAvailable = false
+      hidePrompt()
+      tada()
+      playAnim(1, "play")
+      setTimeout(() => {
+        refresh()
+      }, 12000)
+    }
+  }
+  isCorrectStart = false
+})
+
+window.addEventListener("touchstart", (event) => {
+  mouse.x = ((2 * event.changedTouches[0].clientX - window.innerWidth) / window.innerWidth) * 2 - 1
+  mouse.y = -(event.changedTouches[0].clientY / window.innerHeight) * 2 + 1
+
+  raycaster.setFromCamera(mouse, camera)
+  const intersects = raycaster.intersectObjects(scene.children, true)
+
+  if (intersects.length > 0) {
+    let pointedObject = intersects[0].object
+    if (pointedObject.name == "Hidden_start") isCorrectStart = true
+  }
+})
+
+window.addEventListener("touchend", (event) => {
+  mouse.x = ((2 * event.changedTouches[0].clientX - window.innerWidth) / window.innerWidth) * 2 - 1
+  mouse.y = -(event.changedTouches[0].clientY / window.innerHeight) * 2 + 1
 
   raycaster.setFromCamera(mouse, camera)
   const intersects = raycaster.intersectObjects(scene.children, true)
